@@ -1,0 +1,13 @@
+---
+- name: Install epel repository
+  yum: name=epel-release state=present
+
+- name: Add Varnish repository.
+  command: >
+    rpm --nosignature -i https://repo.varnish-cache.org/redhat/varnish-{{ varnish_version }}.el7.rpm
+  ignore_errors: true
+
+- name: Install Varnish
+  yum:
+    name: varnish
+    state: installed

@@ -1,0 +1,40 @@
+---
+- include: install.yml
+  sudo: true
+  tags:
+    - varnish
+    - install
+
+- name: Ensure Varnish config path exists.
+  file:
+    path: /etc/varnish
+    state: directory
+
+- name: Copy Varnish configuration (systemd).
+  template:
+    src: varnish.params.j2
+    dest: /etc/varnish/varnish.params
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Copy Varnish default VCL.
+  template:
+    src: default.vcl.j2
+    dest: /etc/varnish/default.vcl
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart varnish
+
+- name: Copy varnish secret.
+  file:
+    src: secret
+    dest: /etc/varnish/secret
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart varnish
+
+- name: Ensure Varnish is started and set to run on startup.
+  service: name=varnish state=started enabled=yes
